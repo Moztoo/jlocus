@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dynamic Systems Evaluator</title>
+
+  <!-- Plotly -->
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"></script>
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <header>
+    <div class="title">
+      <h1>Dynamic Systems Evaluator</h1>
+      <div class="sub">Root locus · Time response · Bode (σ = 0) · Minimal dark UI</div>
+    </div>
+  </header>
+
+  <main class="app">
+    <!-- Left: Controls -->
+    <section class="card">
+      <div class="hd">
+        <div class="label">Model</div>
+        <div class="tiny">Coefficients in descending powers</div>
+      </div>
+      <div class="bd">
+        <div class="row">
+          <div class="col">
+            <label for="numIn">num = []</label>
+            <input id="numIn" type="text" value="[1]" spellcheck="false" />
+          </div>
+          <div class="col">
+            <label for="denIn">den = []</label>
+            <input id="denIn" type="text" value="[1, 2, 1]" spellcheck="false" />
+          </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <label>Plant gain K (before G(s))</label>
+        <div class="kwrap">
+          <input id="kSlider" type="range" min="0" max="100" step="0.1" value="1" />
+          <div class="pill"><span id="kVal">1.0</span></div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="row">
+          <div class="col">
+            <label for="inputType">Input type (time response)</label>
+            <select id="inputType">
+              <option value="step">Step</option>
+              <option value="impulse">Impulse</option>
+              <option value="ramp">Ramp</option>
+            </select>
+          </div>
+          <div class="col">
+            <label for="tFinal">Final time (s)</label>
+            <input id="tFinal" type="text" value="10" spellcheck="false" />
+          </div>
+        </div>
+
+        <div class="btnbar">
+          <button id="updateBtn">Update all</button>
+          <button id="resetBtn" class="danger">Reset</button>
+        </div>
+
+        <div id="status" class="status">Ready. Change num/den/K and update.</div>
+
+        <div class="spacer"></div>
+
+        <label>Transfer function (LaTeX)</label>
+        <div class="latexBox">
+          <div id="latexOut"></div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <label>Block diagram</label>
+        <div class="block" id="blockDiagram"></div>
+
+        <div class="tiny mt10">
+          Convention: plant gain <b>K</b> with unity feedback ⇒ characteristic <code>D(s)+K N(s)=0</code>.
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Charts -->
+    <section class="charts">
+      <div class="card">
+        <div class="hd"><div class="label">Plot 1 · Root locus</div></div>
+        <div class="bd"><div id="plotRloc" class="plot"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="hd"><div class="label">Plot 2 · Time response</div></div>
+        <div class="bd"><div id="plotTime" class="plot"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="hd"><div class="label">Plot 3 · Bode (σ = 0 → s = jω)</div></div>
+        <div class="bd"><div id="plotBode" class="plot"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="hd"><div class="label">Plot 4 · Placeholder</div></div>
+        <div class="bd"><div id="plot4" class="plot"></div></div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
