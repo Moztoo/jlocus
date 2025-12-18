@@ -5,6 +5,9 @@ It is designed as an **educational tool** to help students and engineers build i
 
 The name **JLocus** comes from **JavaScript + Root Locus**, reflecting both the technology stack and the main control concept behind the tool.
 
+![alt text](img/preview.jpg)
+
+
 ## What JLocus Does
 
 JLocus allows you to define a continuous-time transfer function:
