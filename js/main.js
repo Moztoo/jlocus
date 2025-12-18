@@ -13,7 +13,7 @@ import { plotRootLocus, updateMovingPolesOnly, plotTimeResponse, plotBode, plotP
 const elNum = document.getElementById("numIn");
 const elDen = document.getElementById("denIn");
 const elK = document.getElementById("kSlider");
-const elKVal = document.getElementById("kVal");
+const elKInput = document.getElementById("kInput");
 const elStatus = document.getElementById("status");
 const elLatex = document.getElementById("latexOut");
 const elBlock = document.getElementById("blockDiagram");
@@ -84,9 +84,19 @@ function updatePolesRealtime(){
   }
 }
 
-// Slider: live update (throttled) + value pill
+function setKUI(k){
+  // Clamp to slider range; keep 1 decimal to match step=0.1
+  const kMin = Number(elK.min);
+  const kMax = Number(elK.max);
+  const kc = Math.min(kMax, Math.max(kMin, k));
+  const kFixed = Number(kc).toFixed(1);
+  elK.value = String(kFixed);
+  elKInput.value = kFixed;
+}
+
+// Slider: live update (throttled) + sync text box
 elK.addEventListener("input", () => {
-  elKVal.textContent = Number(elK.value).toFixed(1);
+  setKUI(Number(elK.value));
 
   if(rafPending) return;
   rafPending = true;
@@ -94,6 +104,34 @@ elK.addEventListener("input", () => {
     rafPending = false;
     updatePolesRealtime();
   });
+});
+
+// Text input: accept typed K, sync slider, and update
+elKInput.addEventListener("input", () => {
+  const k = Number(elKInput.value);
+  if(!Number.isFinite(k)) return;
+  setKUI(k);
+
+  if(rafPending) return;
+  rafPending = true;
+  requestAnimationFrame(() => {
+    rafPending = false;
+    updatePolesRealtime();
+  });
+});
+
+elKInput.addEventListener("change", () => {
+  const k = Number(elKInput.value);
+  if(Number.isFinite(k)) setKUI(k);
+  updateAll();
+});
+
+elKInput.addEventListener("keydown", (e) => {
+  if(e.key === "Enter"){
+    const k = Number(elKInput.value);
+    if(Number.isFinite(k)) setKUI(k);
+    updateAll();
+  }
 });
 
 // When user releases slider, update everything (time response & bode depend on K)
@@ -104,8 +142,7 @@ document.getElementById("updateBtn").addEventListener("click", updateAll);
 document.getElementById("resetBtn").addEventListener("click", () => {
   elNum.value = "[1]";
   elDen.value = "[1, 2, 1]";
-  elK.value = "1";
-  elKVal.textContent = "1.0";
+  setKUI(1);
   elInputType.value = "step";
   elTFinal.value = "10";
   updateAll();

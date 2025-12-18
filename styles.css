@@ -102,13 +102,20 @@ input[type="text"]:focus, select:focus{
   align-items:center;
 }
 input[type="range"]{ width:100%; }
-.pill{
-  padding:10px 10px;
-  border-radius:12px;
-  border:1px solid var(--line);
+.kbox{
+  width: 92px;
+  padding: 10px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
   background: var(--panel2);
-  text-align:center;
+  color: var(--text);
+  text-align: center;
   font-variant-numeric: tabular-nums;
+}
+.kbox:focus{
+  border-color: rgba(122,162,255,.55);
+  box-shadow: 0 0 0 3px rgba(122,162,255,.12);
+  outline: none;
 }
 .btnbar{
   display:flex;

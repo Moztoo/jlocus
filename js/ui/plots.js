@@ -35,46 +35,40 @@ export function plotRootLocus(divId, num, den, Kmax, currentK){
       y: br.map(z => z.im),
       mode: "lines",
       name: "branch",
+      showlegend: false,
       hoverinfo: "skip",
       line: {width: 2}
     });
   }
 
-  // Open-loop poles and zeros (of G(s))
-  const polesOL = polyRootsDurandKerner(den);
-  const zerosOL = polyRootsDurandKerner(num);
+  // Root locus shows how *closed-loop poles* move as K varies.
+  // For the markers/labels, show the current closed-loop TF T(s) = K G(s) / (1 + K G(s)).
+  const { den: denCL } = tfClosedLoopPlantGain(num, den, currentK);
+  const polesCL = polyRootsDurandKerner(denCL);
+  // Zeros of T(s) are the zeros of G(s) (scaling by K does not move them).
+  // For K=0, T(s)=0; showing G(s) zeros is still the most informative.
+  const zerosCL = polyRootsDurandKerner(num);
 
   traces.push({
-    x: polesOL.map(z=>z.re),
-    y: polesOL.map(z=>z.im),
+    x: zerosCL.map(z=>z.re),
+    y: zerosCL.map(z=>z.im),
     mode: "markers",
-    name: "poles (open-loop)",
-    marker: {symbol:"x", size: 10}
-  });
-
-  traces.push({
-    x: zerosOL.map(z=>z.re),
-    y: zerosOL.map(z=>z.im),
-    mode: "markers",
-    name: "zeros (open-loop)",
+    name: "zeros (T, current K)",
     marker: {symbol:"circle-open", size: 10}
   });
 
-  // Moving poles at current K (characteristic D + K N)
-  const charNow = characteristicPoly(num, den, currentK);
-  const polesNow = polyRootsDurandKerner(charNow);
-
   movingPolesTraceIndex = traces.length;
   traces.push({
-    x: polesNow.map(z=>z.re),
-    y: polesNow.map(z=>z.im),
+    x: polesCL.map(z=>z.re),
+    y: polesCL.map(z=>z.im),
     mode: "markers",
-    name: "poles (current K)",
-    marker: {size: 9}
+    name: "poles (T, current K)",
+    marker: {symbol:"x", size: 10}
   });
 
-  // X-axis range biased to the left
-  const allRe = polesOL.concat(zerosOL).map(z => z.re);
+  // X-axis range biased to the left. Use locus points (more robust than just markers).
+  const allPts = rl.branches.flat();
+  const allRe = allPts.map(z => z.re);
   const minRe = Math.min(...allRe, -1);
   const span = Math.max(1, Math.abs(minRe));
   const xmin = minRe - 0.15*span;
